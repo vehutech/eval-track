@@ -1,6 +1,6 @@
 import { auth } from "@/src/lib/auth";
 import { redirect } from "next/navigation";
-import { getAllDeptScores, getInstitutionTrend, getQADashboard } from "@/src/actions/qa-analytics";
+import { getAllDeptScores, getQADashboard } from "@/src/actions/qa-analytics";
 import { Badge } from "@/src/components/ui/badge";
 import { formatDate, formatScore, scoreVariant } from "@/src/lib/utils";
 
