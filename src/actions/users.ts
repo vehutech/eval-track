@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/src/lib/prisma";
-import { createUserSchema, updateUserSchema, resetPasswordSchema } from "@/src/lib/validations/admin";
+import { createUserSchema, resetPasswordSchema } from "@/src/lib/validations/admin";
 import { auth } from "@/src/lib/auth";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
