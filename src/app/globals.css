@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────────
+   All color, radius, and typography values live here.
+   Components reference these variables only — no hardcoded values elsewhere.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --background-subtle: 0 0% 95%;
+    --surface: 0 0% 100%;
+    --surface-raised: 0 0% 97%;
+
+    --foreground: 220 13% 13%;
+    --foreground-muted: 220 9% 46%;
+    --foreground-subtle: 220 9% 64%;
+
+    --accent: 221 83% 53%;
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 221 83% 46%;
+    --accent-subtle: 221 83% 96%;
+
+    --border: 220 13% 91%;
+    --border-strong: 220 13% 82%;
+
+    --success: 142 71% 45%;
+    --success-subtle: 142 71% 95%;
+    --warning: 38 92% 50%;
+    --warning-subtle: 38 92% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-subtle: 0 72% 96%;
+    --destructive-foreground: 0 0% 100%;
+
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
+
+    --radius: 0.5rem;
+    --radius-sm: 0.25rem;
+    --radius-lg: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --background-subtle: 222 47% 11%;
+    --surface: 222 47% 11%;
+    --surface-raised: 222 47% 14%;
+
+    --foreground: 210 40% 96%;
+    --foreground-muted: 215 20% 65%;
+    --foreground-subtle: 215 20% 48%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 217 91% 67%;
+    --accent-subtle: 217 91% 14%;
+
+    --border: 217 33% 18%;
+    --border-strong: 217 33% 26%;
+
+    --success: 142 71% 45%;
+    --success-subtle: 142 71% 10%;
+    --warning: 38 92% 50%;
+    --warning-subtle: 38 92% 10%;
+    --destructive: 0 72% 51%;
+    --destructive-subtle: 0 72% 10%;
+    --destructive-foreground: 0 0% 100%;
+
+    --input: 217 33% 18%;
+    --ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border-strong));
+    border-radius: 999px;
+  }
+}

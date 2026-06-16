@@ -1,0 +1,232 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  LECTURER
+  HOD
+  QA_OFFICER
+  ADMIN
+}
+
+enum EvaluationStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  staffId   String?
+  studentId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lecturer  Lecturer?
+  student   Student?
+  hod       Hod?
+  qaOfficer QaOfficer?
+  admin     Admin?
+
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("users")
+}
+
+model Department {
+  id   String @id @default(cuid())
+  name String @unique
+  code String @unique
+
+  lecturers Lecturer[]
+  students  Student[]
+  hod       Hod?
+  courses   Course[]
+
+  @@map("departments")
+}
+
+model Lecturer {
+  id           String @id @default(cuid())
+  userId       String @unique
+  departmentId String
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id])
+  courses    Course[]
+
+  @@map("lecturers")
+}
+
+model Student {
+  id           String @id @default(cuid())
+  userId       String @unique
+  departmentId String
+  level        Int
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department  Department         @relation(fields: [departmentId], references: [id])
+  enrollments CourseEnrollment[]
+  submissions EvaluationSubmission[]
+
+  @@map("students")
+}
+
+model Hod {
+  id           String @id @default(cuid())
+  userId       String @unique
+  departmentId String @unique
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@map("hods")
+}
+
+model QaOfficer {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("qa_officers")
+}
+
+model Admin {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admins")
+}
+
+model Course {
+  id           String @id @default(cuid())
+  title        String
+  code         String @unique
+  unit         Int
+  departmentId String
+  lecturerId   String
+  semester     Int
+  level        Int
+
+  department  Department @relation(fields: [departmentId], references: [id])
+  lecturer    Lecturer   @relation(fields: [lecturerId], references: [id])
+  enrollments CourseEnrollment[]
+  periodCourses EvaluationPeriodCourse[]
+  submissions EvaluationSubmission[]
+
+  @@index([departmentId, lecturerId])
+  @@map("courses")
+}
+
+model CourseEnrollment {
+  id        String @id @default(cuid())
+  studentId String
+  courseId  String
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+  @@map("course_enrollments")
+}
+
+model EvaluationQuestion {
+  id       String @id @default(cuid())
+  text     String
+  category String
+  order    Int
+
+  responses EvaluationResponse[]
+
+  @@map("evaluation_questions")
+}
+
+model EvaluationPeriod {
+  id           String           @id @default(cuid())
+  title        String
+  academicYear String
+  semester     Int
+  startDate    DateTime
+  endDate      DateTime
+  status       EvaluationStatus @default(DRAFT)
+  createdAt    DateTime         @default(now())
+
+  periodCourses EvaluationPeriodCourse[]
+  submissions   EvaluationSubmission[]
+
+  @@map("evaluation_periods")
+}
+
+model EvaluationPeriodCourse {
+  id                 String @id @default(cuid())
+  evaluationPeriodId String
+  courseId           String
+
+  period EvaluationPeriod @relation(fields: [evaluationPeriodId], references: [id], onDelete: Cascade)
+  course Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([evaluationPeriodId, courseId])
+  @@map("evaluation_period_courses")
+}
+
+model EvaluationSubmission {
+  id                 String           @id @default(cuid())
+  studentId          String
+  evaluationPeriodId String
+  courseId           String
+  status             SubmissionStatus @default(SUBMITTED)
+  submittedAt        DateTime         @default(now())
+
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  period    EvaluationPeriod @relation(fields: [evaluationPeriodId], references: [id])
+  course    Course           @relation(fields: [courseId], references: [id])
+  responses EvaluationResponse[]
+
+  @@unique([studentId, evaluationPeriodId, courseId])
+  @@index([studentId, evaluationPeriodId])
+  @@map("evaluation_submissions")
+}
+
+model EvaluationResponse {
+  id           String @id @default(cuid())
+  submissionId String
+  questionId   String
+  score        Int
+
+  submission EvaluationSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  question   EvaluationQuestion   @relation(fields: [questionId], references: [id])
+
+  @@unique([submissionId, questionId])
+  @@index([submissionId])
+  @@map("evaluation_responses")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
